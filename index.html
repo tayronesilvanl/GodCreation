@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Astronomica do dia</title>
+</head>
+<body>
+    <div id="mainContainer">
+        <h1>Imagem do dia</h1>
+        <label for="datePicker">Selecione uma data</label>
+        <input type="date" id="datePicker">
+        <button onclick="fetchImage()">Ver Imagem</button>
+        <img id="nasaImage" alt="Imagem da NASA" width="500">
+    </div>
+
+    <script>
+        function fetchImage() {
+            const date = document.getElementById("datePicker").value;
+            fetch(`/fetch-Image/${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        document.getElementById('nasaImage').src = data.url;
+                    } else {
+                        alert('Erro na busca da Imagem');
+                    }
+                })
+                .catch(error => {
+                    console.error('erro:', error);
+                    alert('Erro ao buscar Imagem');
+                });
+
+
+        }
+    </script>
+    
+</body>
+</html>
