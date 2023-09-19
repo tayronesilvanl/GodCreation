@@ -1,39 +1,129 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vista Astronomica do dia</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/styles.css">
+        <link rel="stylesheet" href="https://use.typekit.net/jcg5bly.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <title>Vista Astronomica do dia</title>
+    </head>
 <body>
-    <div id="mainContainer">
-        <h1>Imagem do dia</h1>
-        <label for="datePicker">Selecione uma data</label>
-        <input type="date" id="datePicker">
-        <button onclick="fetchImage()">Ver Imagem</button>
-        <img id="nasaImage" alt="Imagem da NASA" width="500">
-    </div>
+    <div class="background-image"></div> <!-- Added this div for the background image -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-right fade-on-scroll">
+                <label for="datePicker" id="labelNome">Selecione uma data:</label>
+                <input type="date" id="datePicker">
+                <button onclick="fetchImage()">Ver Imagem</button>  
+            </div>
+            <div class="nav-left fade-on-scroll">
+                <a href="https://www.instagram.com/seu_usuario" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://github.com/seu_usuario" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/seu_usuario/" target="_blank"><i class="fab fa-linkedin"></i></a>
 
+            </div>
+        </div>
+    </nav>
+
+    <div id="Titulo">
+        <h1>Imagem do dia</h1>
+    </div>
+    <div id="Autor">
+        <h2></h2>
+    </div>
+    <section id="SecaoImagem" class="parallax-section">
+    <div id="mainContainer">
+        <img id="nasaImage" alt="Imagem da NASA" width="700">
+        <div id="ImageDescription">
+            <p id="DescriptionText"></p>
+        </div>
+    </div>
+    <div id="QuoteOfDay">
+        <p Id="Quote"></p>
+    </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         function fetchImage() {
-            const date = document.getElementById("datePicker").value;
-            fetch(`/fetch-Image/${date}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.url) {
-                        document.getElementById('nasaImage').src = data.url;
-                    } else {
-                        alert('Erro na busca da Imagem');
-                    }
-                })
-                .catch(error => {
-                    console.error('erro:', error);
-                    alert('Erro ao buscar Imagem');
-                });
+    const date = document.getElementById("datePicker").value;
+    
+    // Buscar a imagem do dia
+    fetch(`/fetch-Image/${date}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                const imgElement = document.getElementById('nasaImage');
+                imgElement.src = data.url;
+                imgElement.style.display = 'block';
+                document.getElementById('nasaImage').src = data.url;
+                document.getElementById('Titulo').innerText = data.title;
+                document.getElementById('Autor').innerText = data.copyright;
+                document.getElementById('DescriptionText').innerText = data.explanation;
+            } else {
+                alert('Erro na busca da Imagem');
+            }
+        })
+        .catch(error => {
+            console.error('erro:', error);
+            alert('Erro ao buscar Imagem');
+        });
+
+    // Buscar a frase do dia
+        // Buscar a frase do dia
+    fetch('particles-config.json')
+        .then(response => response.json())
+        .then(data => {
+            particlesJS('particles-js', data);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar a configuração do particles.js:', error);
+    });
+    fetch('/fetch-quote')
+        .then(response => response.json())
+        .then(data => {
+            const quoteData = data[0];  // Acesse o primeiro item da lista
+            console.log(quoteData);  // Verifique o conteúdo do objeto
+            if (quoteData && quoteData.quote) {
+                document.getElementById('Quote').innerText = `"${quoteData.quote}" - ${quoteData.author}`;
+            } else {
+                alert('Erro na busca da frase do dia');
+            }
+        })
+        .catch(error => {
+            console.error('erro:', error);
+            alert('Erro ao buscar frase do dia');
+        });
+
+}
+
+window.addEventListener('scroll', function() {
+    const fadeElements = document.querySelectorAll('.fade-on-scroll');
+    if (window.scrollY > 50) { // Se a rolagem for maior que 50 pixels
+        fadeElements.forEach(el => {
+            el.style.opacity = '0.6'; // Torna os elementos um pouco transparentes
+        });
+    } else {
+        fadeElements.forEach(el => {
+            el.style.opacity = '1'; // Restaura a opacidade original dos elementos
+        });
+    }
+});
+
+window.addEventListener('scroll', function() {
+    if (window.scrollY > 10) { // Se a página for rolada mais de 10 pixels
+        document.body.classList.add('scrolled');
+    } else {
+        document.body.classList.remove('scrolled');
+    }
+});
 
 
-        }
+
     </script>
+
+
+
     
 </body>
 </html>
